@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="readDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${spring.database.read.driverClassName}" />
+		<property name="url" value="${spring.database.read.url}" />
+		<property name="username" value="${spring.database.read.username}" />
+		<property name="password" value="${spring.database.read.password}" />
+		<property name="validationQuery" value="select 1"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="timeBetweenEvictionRunsMillis" value="7200000"/>
+	</bean>
+
+	<bean id="writeDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${spring.database.write.driverClassName}" />
+		<property name="url" value="${spring.database.write.url}" />
+		<property name="username" value="${spring.database.write.username}" />
+		<property name="password" value="${spring.database.write.password}" />
+		<property name="validationQuery" value="select 1"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="timeBetweenEvictionRunsMillis" value="7200000"/>
+	</bean>
+
+</beans>

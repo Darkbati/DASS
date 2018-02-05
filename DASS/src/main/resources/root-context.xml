@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:batch="http://www.springframework.org/schema/batch" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.2.xsd">
+
+	<context:annotation-config />
+	<context:spring-configured />
+	<context:property-placeholder
+		ignore-resource-not-found="true" ignore-unresolvable="true"
+		location="file:${config.path}/${service.profile}/config.properties,${config.path}/${service.profile}/cassandra.properties" />
+
+	<context:component-scan base-package="com.eoasis.dataserver.*" />
+
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="${spring.taskExecutor.corePoolSize:20}" />
+		<property name="maxPoolSize" value="${spring.taskExecutor.maxPoolSize:100}" />
+		<property name="queueCapacity" value="${spring.taskExecutor.queueCapacity:1000}" />
+		<property name="keepAliveSeconds" value="${spring.taskExecutor.keepAliveSeconds:60}" />
+	</bean>
+
+	<task:annotation-driven executor="taskExecutor" />
+	<task:executor id="asynExecutor"
+		pool-size="${spring.taskExecutor.maxPoolSize:100}" queue-capacity="${spring.taskExecutor.queueCapacity:1000}"
+		keep-alive="${spring.taskExecutor.keepAliveSeconds:60}" />
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- <import resource="classpath:mybatis/*.xml" /> -->
+	<!-- <import resource="classpath:redis/context-redis.xml" /> -->
+
+</beans>
