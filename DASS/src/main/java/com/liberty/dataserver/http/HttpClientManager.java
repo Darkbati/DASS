@@ -37,17 +37,14 @@ public class HttpClientManager {
 		connectionManager.closeIdleConnections(5L, TimeUnit.MICROSECONDS);
 		connectionManager.setDefaultSocketConfig(SocketConfig.custom().setTcpNoDelay(Boolean.parseBoolean(TcpNoDelay))
 				.setSoKeepAlive(Boolean.parseBoolean(KeepAlive)).setSoLinger(SoLinger)
-				.setSoReuseAddress(Boolean.parseBoolean(SoReuseAddress)).setSoTimeout(Timeout)
-				.build());
+				.setSoReuseAddress(Boolean.parseBoolean(SoReuseAddress)).setSoTimeout(Timeout).build());
 
 		httpClientBuilder = HttpClientBuilder.create();
 		httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(HttpRequestRetry, false));
 		httpClientBuilder.setConnectionManagerShared(true);
 		httpClientBuilder.setConnectionManager(connectionManager);
-		httpClientBuilder
-				.setDefaultRequestConfig(RequestConfig.custom().setSocketTimeout(SocketTimeout)
-						.setConnectionRequestTimeout(RequestTimeout)
-						.setConnectTimeout(ConnectTimeout).build());
+		httpClientBuilder.setDefaultRequestConfig(RequestConfig.custom().setSocketTimeout(SocketTimeout)
+				.setConnectionRequestTimeout(RequestTimeout).setConnectTimeout(ConnectTimeout).build());
 	}
 
 	public synchronized CloseableHttpClient createHttpClient() {

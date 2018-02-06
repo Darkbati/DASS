@@ -12,8 +12,8 @@
 	<aop:aspectj-autoproxy proxy-target-class="true" />
 	<!-- @Service단에서 Transaction 처리도 함께 해주기 위해 transaction manager의 order는 2로 
 		내려준다. -->
-	<tx:annotation-driven proxy-target-class="true"
-		order="2" />
+	<!-- <tx:annotation-driven proxy-target-class="true"
+		order="2" /> -->
 
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="datasource" />
