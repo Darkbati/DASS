@@ -12,8 +12,7 @@
 	<aop:aspectj-autoproxy proxy-target-class="true" />
 	<!-- @Service단에서 Transaction 처리도 함께 해주기 위해 transaction manager의 order는 2로 
 		내려준다. -->
-	<!-- <tx:annotation-driven proxy-target-class="true"
-		order="2" /> -->
+	<!-- <tx:annotation-driven proxy-target-class="true" order="2" /> -->
 
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="datasource" />
@@ -21,20 +20,22 @@
 		<property name="mapperLocations" value="classpath:sqlmaps/*.xml" />
 	</bean>
 
+	<!-- 
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="datasource" />
-	</bean>
+	</bean> 
+	-->
 
-	<!-- <util:list id="dataDBList" list-class="java.util.List">
-		<ref bean="writeDataSource" />
-		<ref bean="readDataSource" />
-	</util:list> -->
+	<util:map id="dataSourceMap" key-type="java.lang.String">
+		<entry key="Master" value-ref="writeDataSource" />
+		<entry key="Slave" value-ref="readDataSource" />
+	</util:map>
 
 	<bean id="datasource" class="com.liberty.dataserver.database.DatabaseSourceRouter">
 		<property name="targetDataSources">
 			<map key-type="com.liberty.dataserver.database.DatabaseSourceType">
-				<entry key="Master" value-ref="writeDataSource" />
+				<!-- <entry key="Master" value-ref="writeDataSource" /> -->
 				<entry key="Slave" value-ref="readDataSource" />
 				<!-- <entry key="MultipleDatabase" value-ref="dataDBList" /> -->
 			</map>
