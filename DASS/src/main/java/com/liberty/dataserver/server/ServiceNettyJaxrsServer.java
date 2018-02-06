@@ -87,50 +87,41 @@ public class ServiceNettyJaxrsServer extends NettyJaxrsServer {
 		eventLoopGroup = new NioEventLoopGroup(ioWorkerCount);
 		eventExecutor = new NioEventLoopGroup(executorThreadCount);
 		deployment.start();
-		final RequestDispatcher dispatcher = new RequestDispatcher((SynchronousDispatcher) deployment.getDispatcher(),
-				deployment.getProviderFactory(), domain);
+		final RequestDispatcher dispatcher = new RequestDispatcher((SynchronousDispatcher) deployment.getDispatcher(), deployment.getProviderFactory(), domain);
 		// Configure the server.
 		if (sslContext == null) {
-			bootstrap.group(eventLoopGroup).channel(NioServerSocketChannel.class)
-					.childHandler(new ChannelInitializer<SocketChannel>() {
-						@Override
-						public void initChannel(SocketChannel ch) throws Exception {
-							ch.pipeline().addLast(new HttpRequestDecoder());
-							ch.pipeline().addLast(new HttpObjectAggregator(maxRequestSize));
-							ch.pipeline().addLast(new HttpResponseEncoder());
-							ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(30));
-							ch.pipeline().addLast("writeTimeoutHandler", new WriteTimeoutHandler(5));
-							ch.pipeline().addLast(new RestEasyHttpRequestDecoder(dispatcher.getDispatcher(), root,
-									RestEasyHttpRequestDecoder.Protocol.HTTP));
-							ch.pipeline().addLast(new UtsHeadersChannelHandler());
-							ch.pipeline().addLast(new RestEasyHttpResponseEncoder());
-							ch.pipeline().addLast(eventExecutor, new RequestHandler(dispatcher));
-						}
-					}).option(ChannelOption.SO_BACKLOG, backlog).childOption(ChannelOption.SO_KEEPALIVE, false)
-					.option(ChannelOption.TCP_NODELAY, true).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000)
-					.option(ChannelOption.SO_LINGER, 0).option(ChannelOption.SO_REUSEADDR, true);
+			bootstrap.group(eventLoopGroup).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
+				@Override
+				public void initChannel(SocketChannel ch) throws Exception {
+					ch.pipeline().addLast(new HttpRequestDecoder());
+					ch.pipeline().addLast(new HttpObjectAggregator(maxRequestSize));
+					ch.pipeline().addLast(new HttpResponseEncoder());
+					ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(30));
+					ch.pipeline().addLast("writeTimeoutHandler", new WriteTimeoutHandler(5));
+					ch.pipeline().addLast(new RestEasyHttpRequestDecoder(dispatcher.getDispatcher(), root, RestEasyHttpRequestDecoder.Protocol.HTTP));
+					ch.pipeline().addLast(new UtsHeadersChannelHandler());
+					ch.pipeline().addLast(new RestEasyHttpResponseEncoder());
+					ch.pipeline().addLast(eventExecutor, new RequestHandler(dispatcher));
+				}
+			}).option(ChannelOption.SO_BACKLOG, backlog).childOption(ChannelOption.SO_KEEPALIVE, false).option(ChannelOption.TCP_NODELAY, true).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000).option(ChannelOption.SO_LINGER, 0).option(ChannelOption.SO_REUSEADDR, true);
 		} else {
 			final SSLEngine engine = sslContext.createSSLEngine();
 			engine.setUseClientMode(false);
-			bootstrap.group(eventLoopGroup).channel(NioServerSocketChannel.class)
-					.childHandler(new ChannelInitializer<SocketChannel>() {
-						@Override
-						public void initChannel(SocketChannel ch) throws Exception {
-							ch.pipeline().addFirst(new SslHandler(engine));
-							ch.pipeline().addLast(new HttpRequestDecoder());
-							ch.pipeline().addLast(new HttpObjectAggregator(maxRequestSize));
-							ch.pipeline().addLast(new HttpResponseEncoder());
-							ch.pipeline().addLast(new RestEasyHttpRequestDecoder(dispatcher.getDispatcher(), root,
-									RestEasyHttpRequestDecoder.Protocol.HTTPS));
-							ch.pipeline().addLast(new UtsHeadersChannelHandler());
-							ch.pipeline().addLast(new RestEasyHttpResponseEncoder());
-							ch.pipeline().addLast(eventExecutor, new RequestHandler(dispatcher));
-						}
-					}).option(ChannelOption.SO_BACKLOG, backlog).childOption(ChannelOption.SO_KEEPALIVE, false)
-					.option(ChannelOption.TCP_NODELAY, true).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000)
-					.option(ChannelOption.SO_LINGER, 0).option(ChannelOption.SO_REUSEADDR, true);
+			bootstrap.group(eventLoopGroup).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
+				@Override
+				public void initChannel(SocketChannel ch) throws Exception {
+					ch.pipeline().addFirst(new SslHandler(engine));
+					ch.pipeline().addLast(new HttpRequestDecoder());
+					ch.pipeline().addLast(new HttpObjectAggregator(maxRequestSize));
+					ch.pipeline().addLast(new HttpResponseEncoder());
+					ch.pipeline().addLast(new RestEasyHttpRequestDecoder(dispatcher.getDispatcher(), root, RestEasyHttpRequestDecoder.Protocol.HTTPS));
+					ch.pipeline().addLast(new UtsHeadersChannelHandler());
+					ch.pipeline().addLast(new RestEasyHttpResponseEncoder());
+					ch.pipeline().addLast(eventExecutor, new RequestHandler(dispatcher));
+				}
+			}).option(ChannelOption.SO_BACKLOG, backlog).childOption(ChannelOption.SO_KEEPALIVE, false).option(ChannelOption.TCP_NODELAY, true).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000).option(ChannelOption.SO_LINGER, 0).option(ChannelOption.SO_REUSEADDR, true);
 		}
-		bootstrap.bind(port).syncUninterruptibly();
+		bootstrap.bind(getPort()).syncUninterruptibly();
 	}
 
 }

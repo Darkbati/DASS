@@ -1,5 +1,6 @@
 package com.liberty.dataserver.config;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,12 +23,22 @@ public class ReloadApplicationProperties {
 
 	static {
 		try {
-			String configpath = System.getProperty("service.config");
-			if (StringUtils.isEmpty(configpath)) {
-				throw new Exception("not found the config properties");
+			String configPath = System.getProperty("service.config");
+			if (StringUtils.isEmpty(configPath)) {
+				StringBuilder builder = new StringBuilder();
+				builder.append("./config/");
+				builder.append(System.getProperty("spring.profiles.active"));
+				builder.append("/config.properties");
+
+				File configFile = new File(builder.toString());
+				if (configFile.isFile() == false) {
+					throw new Exception("not found the config properties");
+				}
+
+				configPath = builder.toString();
 			}
 
-			configuration = new PropertiesConfiguration(configpath);
+			configuration = new PropertiesConfiguration(configPath);
 			FileChangedReloadingStrategy reloadStrategy = new FileChangedReloadingStrategy();
 			reloadStrategy.setRefreshDelay(1000);
 			configuration.setReloadingStrategy(reloadStrategy);
@@ -67,7 +78,6 @@ public class ReloadApplicationProperties {
 		} catch (Exception e) {
 			logger.error("SYSTEM: System Reason=[Error while reading the file Properties. Exception],ExceptionMessage=", e);
 		} finally {
-			System.out.println("");
 		}
 	}
 
@@ -82,7 +92,8 @@ public class ReloadApplicationProperties {
 			return defaultValue;
 
 		synchronized (configuration) {
-			return configuration.getString(key);
+			String value = configuration.getString(key);
+			return StringUtils.isEmpty(value) == true ? defaultValue : value;
 		}
 	}
 

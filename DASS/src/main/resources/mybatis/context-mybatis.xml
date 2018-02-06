@@ -2,33 +2,50 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-	<bean id="sqlSessionFactoryWrite" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="writeDataSource" />
-		<property name="configLocation" value="classpath:mybatis/mybatis-config-base.xml" />
-		<property name="mapperLocations" value="classpath:sqlmaps/*.xml" />
-	</bean>
-	
-	<bean id="transactionManagerWrite" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="writeDataSource"/>
-	</bean>	
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<!-- @Service단에서 Transaction 처리도 함께 해주기 위해 transaction manager의 order는 2로 
+		내려준다. -->
+	<tx:annotation-driven proxy-target-class="true"
+		order="2" />
 
-	<bean id="sqlSessionFactoryRead" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="readDataSource" />
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="datasource" />
 		<property name="configLocation" value="classpath:mybatis/mybatis-config-base.xml" />
 		<property name="mapperLocations" value="classpath:sqlmaps/*.xml" />
 	</bean>
-	
-	<bean id="transactionManagerRead" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="readDataSource"/>
-	</bean>	
-	
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="datasource" />
+	</bean>
+
+	<!-- <util:list id="dataDBList" list-class="java.util.List">
+		<ref bean="writeDataSource" />
+		<ref bean="readDataSource" />
+	</util:list> -->
+
+	<bean id="datasource" class="com.liberty.dataserver.database.DatabaseSourceRouter">
+		<property name="targetDataSources">
+			<map key-type="com.liberty.dataserver.database.DatabaseSourceType">
+				<entry key="Master" value-ref="writeDataSource" />
+				<entry key="Slave" value-ref="readDataSource" />
+				<!-- <entry key="MultipleDatabase" value-ref="dataDBList" /> -->
+			</map>
+		</property>
+		<!-- Default DataSource -->
+		<property name="defaultTargetDataSource" ref="writeDataSource" />
+	</bean>
+
 	<!-- scan for mappers and let them be autowired -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.real.obm" />
+		<property name="basePackage" value="com.liberty.dataserver" />
 		<property name="annotationClass" value="org.springframework.stereotype.Repository" />
 	</bean>
 

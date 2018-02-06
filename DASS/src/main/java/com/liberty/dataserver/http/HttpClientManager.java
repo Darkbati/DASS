@@ -20,7 +20,7 @@ public class HttpClientManager {
 
 	public HttpClientManager() {
 		Integer Timeout = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("Http.Timeout", "3000"), "3000");
-		Integer MaxTotal = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("Http.MaxTotal", "10"), "10");
+		Integer MaxTotal = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("Http.MaxTotal", "1000"), "1000");
 		Integer MaxPerRoute = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("Http.MaxPerRoute", "10"), "10");
 		Integer SocketTimeout = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("Http.SocketTimeout", "3000"), "3000");
 		Integer RequestTimeout = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("Http.RequestTimeout", "3000"), "3000");
@@ -31,7 +31,7 @@ public class HttpClientManager {
 		String SoReuseAddress = ReloadApplicationProperties.getProperty("Http.SoReuseAddress", "true");
 		Integer HttpRequestRetry = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("Http.RequestRetry", "3"), "3");
 
-		connectionManager = new PoolingHttpClientConnectionManager(1000, TimeUnit.MICROSECONDS);
+		connectionManager = new PoolingHttpClientConnectionManager(5, TimeUnit.MICROSECONDS);
 		connectionManager.setMaxTotal(MaxTotal);
 		connectionManager.setDefaultMaxPerRoute(MaxPerRoute);
 		connectionManager.closeIdleConnections(5L, TimeUnit.MICROSECONDS);
