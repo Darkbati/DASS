@@ -18,13 +18,4 @@ public class MainService {
 		NettyServer netty = ctx.getBean(NettyServer.class);
 		netty.start();
 	}
-
-	public static boolean isNumber(String s) {
-		try {
-			Long.parseLong(s);
-			return true;
-		} catch (NumberFormatException e) {
-			return false;
-		}
-	}
 }

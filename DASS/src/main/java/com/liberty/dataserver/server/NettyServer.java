@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 
+import com.liberty.dataserver.common.ConverterNumber;
+import com.liberty.dataserver.config.ReloadApplicationProperties;
+
 @Component
 public class NettyServer {
 
@@ -26,6 +29,11 @@ public class NettyServer {
 	protected ServiceNettyJaxrsServer netty;
 
 	public void start() {
+		port = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("server.port", "9500"), "9500");
+		baklog = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("server.baklog", "128"), "128");
+		maxRequestSize = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("server.maxRequestSize", "10485760"), "10485760");
+		executorThreadCount = ConverterNumber.parseInt(ReloadApplicationProperties.getProperty("server.executorThreadCount", "8"), "8");
+
 		ResteasyDeployment dp = new ResteasyDeployment();
 		Collection<Object> providers = context.getBeansWithAnnotation(Provider.class).values();
 		Collection<Object> controllers = context.getBeansWithAnnotation(Controller.class).values();
