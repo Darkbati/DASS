@@ -24,6 +24,7 @@ public class ExecutionLoggingAspect implements InitializingBean {
 			method = joinPoint.getTarget().getClass().getDeclaredMethod(methodName, method.getParameterTypes());
 		}
 
+		/*
 		DataSource dataSource = (DataSource) method.getAnnotation(DataSource.class);
 		if (dataSource != null) {
 			DatabaseContextHolder.setDataSourceType(dataSource.value());
@@ -32,6 +33,7 @@ public class ExecutionLoggingAspect implements InitializingBean {
 				DatabaseContextHolder.setDataSourceType(DatabaseSourceType.Master);
 			}
 		}
+		*/
 
 		Object returnValue = joinPoint.proceed();
 		DatabaseContextHolder.clearDataSourceType();

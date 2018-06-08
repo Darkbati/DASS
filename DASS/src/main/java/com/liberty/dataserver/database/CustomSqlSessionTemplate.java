@@ -3,8 +3,8 @@ package com.liberty.dataserver.database;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 
-public class NexusSqlSessionTemplate extends SqlSessionTemplate {
-	public NexusSqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+public class CustomSqlSessionTemplate extends SqlSessionTemplate {
+	public CustomSqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
 		super(sqlSessionFactory);
 	}
 

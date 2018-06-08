@@ -2,7 +2,7 @@ package com.liberty.dataserver.database;
 
 import org.apache.ibatis.session.SqlSession;
 
-public interface NexusSqlSession extends SqlSession {
+public interface CustomSqlSession extends SqlSession {
 
 	public default int insertAll(String statement) {
 		return this.insert(statement);
